@@ -233,11 +233,25 @@ class Level:
 		if enemy_collisions:
 			for enemy in enemy_collisions:
 				enemy_center = enemy.rect.centery
+				enemy_centerX = enemy.rect.centerx
 				enemy_top = enemy.rect.top
+				enemy_bottom = enemy.rect.bottom
+				enemy_right = enemy.rect.right
+				enemy_left = enemy.rect.left
+				player_centerX = self.player.sprite.rect.centerx
 				player_bottom = self.player.sprite.rect.bottom
+				player_top = self.player.sprite.rect.top
+				player_right = self.player.sprite.rect.right
+				player_left = self.player.sprite.rect.left
 				if enemy_top < player_bottom < enemy_center and self.player.sprite.direction.y >= 0:
 					self.stomp_sound.play()
-					self.player.sprite.direction.y = -15
+					self.player.sprite.direction.y = -10
+					explosion_sprite = ParticleEffect(enemy.rect.center,'explosion')
+					self.explosion_sprites.add(explosion_sprite)
+					enemy.kill()
+				elif self.player.sprite.onAttack == True and 4 < self.player.sprite.frame_index < 8 and ((self.player.sprite.facing_right == True and enemy_left > player_centerX) or (self.player.sprite.facing_right == False and enemy_right < player_centerX)):
+					self.stomp_sound.play()
+					#self.player.sprite.direction.y = -10
 					explosion_sprite = ParticleEffect(enemy.rect.center,'explosion')
 					self.explosion_sprites.add(explosion_sprite)
 					enemy.kill()

@@ -1,3 +1,4 @@
+import random
 import pygame 
 from support import import_folder
 from math import sin
@@ -32,6 +33,8 @@ class Player(pygame.sprite.Sprite):
 		self.on_ceiling = False
 		self.on_left = False
 		self.on_right = False
+		self.onHit = False
+		self.onAttack = False
 
 		# health management
 		self.change_health = change_health
@@ -46,7 +49,7 @@ class Player(pygame.sprite.Sprite):
 
 	def import_character_assets(self):
 		character_path = '../graphics/character/'
-		self.animations = {'idle':[],'run':[],'jump':[],'fall':[]}
+		self.animations = {'idle':[],'run':[],'jump':[],'fall':[], 'hit':[], 'attack':[], 'skill':[]}
 
 		for animation in self.animations.keys():
 			full_path = character_path + animation
@@ -62,6 +65,8 @@ class Player(pygame.sprite.Sprite):
 		self.frame_index += self.animation_speed
 		if self.frame_index >= len(animation):
 			self.frame_index = 0
+			self.onHit = False
+			self.onAttack = False
 
 		image = animation[int(self.frame_index)]
 		if self.facing_right:
@@ -97,9 +102,21 @@ class Player(pygame.sprite.Sprite):
 				self.display_surface.blit(flipped_dust_particle,pos)
 
 	def get_input(self):
+		if(self.onAttack == True):
+			return
+
 		keys = pygame.key.get_pressed()
 
-		if keys[pygame.K_RIGHT]:
+		if keys[pygame.K_x] and self.on_ground:
+			self.onAttack = True
+			self.status = 'attack'
+			self.frame_index = 0
+		elif keys[pygame.K_c] and self.on_ground:
+			self.onAttack = True
+			self.status = 'skill'
+			self.frame_index = 0
+
+		elif keys[pygame.K_RIGHT]:
 			self.direction.x = 1
 			self.facing_right = True
 		elif keys[pygame.K_LEFT]:
@@ -113,6 +130,15 @@ class Player(pygame.sprite.Sprite):
 			self.create_jump_particles(self.rect.midbottom)
 
 	def get_status(self):
+		if self.onHit == True:
+			self.status = 'hit'
+			return
+		if self.onAttack == True:
+			if(self.status != 'attack' and self.status != 'skill'):
+				randAttack = ['attack', 'skill']
+				self.status = random.choice(randAttack)
+			return
+
 		if self.direction.y < 0:
 			self.status = 'jump'
 		elif self.direction.y > 1:
@@ -136,6 +162,9 @@ class Player(pygame.sprite.Sprite):
 			self.hit_sound.play()
 			self.change_health(-10)
 			self.invincible = True
+			self.onHit = True
+			self.onAttack = False
+			self.frame_index = 0
 			self.hurt_time = pygame.time.get_ticks()
 
 	def invincibility_timer(self):
