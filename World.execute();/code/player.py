@@ -46,6 +46,8 @@ class Player(pygame.sprite.Sprite):
 		self.jump_sound = pygame.mixer.Sound('../audio/effects/jump.wav')
 		self.jump_sound.set_volume(0.5)
 		self.hit_sound = pygame.mixer.Sound('../audio/effects/hit.wav')
+		self.magic_sound_1 = pygame.mixer.Sound('../audio/effects/magic_explode.wav')
+		self.magic_sound_2 = pygame.mixer.Sound('../audio/effects/spell_attack.wav')
 
 	def import_character_assets(self):
 		character_path = '../graphics/character/'
@@ -107,14 +109,16 @@ class Player(pygame.sprite.Sprite):
 
 		keys = pygame.key.get_pressed()
 
-		if keys[pygame.K_x] and self.on_ground:
+		if keys[pygame.K_x] and self.on_ground and self.onHit == False:
 			self.onAttack = True
 			self.status = 'attack'
 			self.frame_index = 0
-		elif keys[pygame.K_c] and self.on_ground:
+			self.magic_sound_1.play()
+		elif keys[pygame.K_c] and self.on_ground and self.onHit == False:
 			self.onAttack = True
 			self.status = 'skill'
 			self.frame_index = 0
+			self.magic_sound_2.play()
 
 		elif keys[pygame.K_RIGHT]:
 			self.direction.x = 1
@@ -159,6 +163,8 @@ class Player(pygame.sprite.Sprite):
 
 	def get_damage(self):
 		if not self.invincible:
+			self.magic_sound_1.stop()
+			self.magic_sound_2.stop()
 			self.hit_sound.play()
 			self.change_health(-10)
 			self.invincible = True
