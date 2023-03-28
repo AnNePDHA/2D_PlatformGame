@@ -1,7 +1,7 @@
 import pygame 
 from support import import_csv_layout, import_cut_graphics
 from settings import tile_size, screen_height, screen_width
-from tiles import Tile, StaticTile, Crate, Coin, Palm
+from tiles import Tile, StaticTile, Crate, Coin, Palm, Pillar
 from enemy import Enemy
 from boss import Boss
 from decoration import Sky, Water, Clouds
@@ -101,6 +101,7 @@ class Level:
 						tile_surface = terrain_tile_list[int(val)]
 						sprite = StaticTile(tile_size,x,y,tile_surface)
 						
+						
 					if type == 'grass':
 						grass_tile_list = import_cut_graphics('../graphics/decoration/grass/grass.png')
 						tile_surface = grass_tile_list[int(val)]
@@ -108,6 +109,9 @@ class Level:
 					
 					if type == 'crates':
 						sprite = Crate(tile_size,x,y)
+
+					if type == 'pillar':
+						sprite = Pillar(tile_size,x,y)	
 
 					if type == 'coins':
 						if val == '0': sprite = Coin(tile_size,x,y,'../graphics/coins/gold',5)
@@ -124,7 +128,7 @@ class Level:
 						sprite = Enemy(tile_size,x,y)
 
 					if type == 'boss':
-						sprite = Boss(tile_size,x,y,500)
+						sprite = Boss(tile_size,x,y,100)
 
 					if type == 'constraint':
 						sprite = Tile(tile_size,x,y)
@@ -304,7 +308,6 @@ class Level:
 					self.explosion_sprites.add(explosion_sprite)
 					boss.onHit = True
 				else:
-					boss.onHit = False
 					boss.onAttack = True
 					self.player.sprite.get_damage()
 

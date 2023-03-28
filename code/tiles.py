@@ -21,6 +21,12 @@ class Crate(StaticTile):
 		offset_y = y + size
 		self.rect = self.image.get_rect(bottomleft = (x,offset_y))
 
+class Pillar(StaticTile):
+	def __init__(self,size,x,y):
+		super().__init__(size,x,y,pygame.image.load('../graphics/terrain/rock-pillar.png').convert_alpha())
+		offset_y = y + size
+		self.rect = self.image.get_rect(bottomleft = (x,offset_y))
+
 class AnimatedTile(Tile):
 	def __init__(self,size,x,y,path):
 		super().__init__(size,x,y)

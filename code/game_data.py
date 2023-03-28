@@ -9,6 +9,7 @@ level_0 = {
 		'constraints':'../levels/0/level_0_constraints.csv',
 		'player': '../levels/0/level_0_player.csv',
 		'grass': '../levels/0/level_0_grass.csv',
+        'pillar':'../levels/0/level_0_pillar.csv',
 		'node_pos': (110,400),
 		'unlock': 1,
 		'node_graphics': '../graphics/overworld/0'}
