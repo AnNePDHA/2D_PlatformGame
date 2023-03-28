@@ -9,17 +9,12 @@ class Boss(AnimatedTile):
 		super().__init__(size,x,y,'../graphics/BiggerBoss/walk')
 		self.import_character_assets()
 		self.image = self.animations['walk'][self.frame_index]
-		self.rect.y += size - self.image.get_size()[1]
+		self.rect.y += size - 64
 		self.animation_speed = 0.15
 		self.speed = 3
 
 		# boss status
 		self.status = 'walk'
-		self.facing_right = True
-		self.on_ground = False
-		self.on_ceiling = False
-		self.on_left = False
-		self.on_right = False
 		self.onHit = False
 		self.onAttack = False
 
@@ -31,7 +26,7 @@ class Boss(AnimatedTile):
 
 	def import_character_assets(self):
 		character_path = '../graphics/BiggerBoss/'
-		self.animations = {'walk':[],'attack':[],'hurt':[], 'death':[]}
+		self.animations = {'idle':[], 'walk':[],'attack':[],'hurt':[], 'death':[]}
 
 		for animation in self.animations.keys():
 			full_path = character_path + animation
@@ -39,7 +34,6 @@ class Boss(AnimatedTile):
 
 	def animate(self):
 		animation = self.animations[self.status]
-		self.image = self.frames[int(self.frame_index)]
 
 		# loop over frame index
 		self.frame_index += self.animation_speed
@@ -47,6 +41,14 @@ class Boss(AnimatedTile):
 			self.frame_index = 0
 			self.onHit = False
 			self.onAttack = False
+
+		self.image = animation[int(self.frame_index)]
+
+		if self.invincible:
+			alpha = self.wave_value()
+			self.image.set_alpha(alpha)
+		else:
+			self.image.set_alpha(255)
 
 		self.rect = self.image.get_rect(midbottom = self.rect.midbottom)
 
@@ -62,23 +64,28 @@ class Boss(AnimatedTile):
 
 	def set_status(self, status):
 		self.status = status
-		print(self.status)
 
 	def get_status(self):
 		if self.onHit:
-			self.status = 'hurt'
-			self.get_damage()
-			if self.change_health <= 0:
-				self.kill()
+			if self.status != 'hurt':
+				self.status = 'hurt'
+				self.frame_index = 0
+				self.get_damage()
+				if self.change_health <= 0:
+					self.kill()
 		elif self.onAttack:
 			if self.status != 'attack':
 				self.status = 'attack'
+				self.frame_index = 0
 		else:
+			if self.status != 'walk':
+				self.status = 'walk'
+				self.frame_index = 0
 			self.move()
 
 	def get_damage(self):
 		if not self.invincible:
-			self.change_health -= 10
+			self.change_health -= 5
 			self.invincible = True
 			self.onHit = True
 			self.onAttack = False

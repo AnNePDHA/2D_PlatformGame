@@ -124,7 +124,7 @@ class Level:
 						sprite = Enemy(tile_size,x,y)
 
 					if type == 'boss':
-						sprite = Boss(tile_size,x,y,100)
+						sprite = Boss(tile_size,x,y,500)
 
 					if type == 'constraint':
 						sprite = Tile(tile_size,x,y)
@@ -304,6 +304,7 @@ class Level:
 					self.explosion_sprites.add(explosion_sprite)
 					boss.onHit = True
 				else:
+					boss.onHit = False
 					boss.onAttack = True
 					self.player.sprite.get_damage()
 

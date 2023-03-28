@@ -9,8 +9,8 @@ class Game:
 
 		# game attributes
 		self.max_level = 2
-		self.max_health = 100
-		self.cur_health = 100
+		self.max_health = 200
+		self.cur_health = 200
 		self.coins = 0
 		
 		# audio 
