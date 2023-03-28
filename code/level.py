@@ -1,7 +1,7 @@
 import pygame 
 from support import import_csv_layout, import_cut_graphics
 from settings import tile_size, screen_height, screen_width
-from tiles import Tile, StaticTile, Crate, Coin, Palm, Pillar
+from tiles import Tile, StaticTile, Crate, Coin, Palm, Pillar, CrateItem
 from enemy import Enemy
 from boss import Boss
 from decoration import Sky, Water, Clouds
@@ -58,6 +58,10 @@ class Level:
 		# coins 
 		coin_layout = import_csv_layout(level_data['coins'])
 		self.coin_sprites = self.create_tile_group(coin_layout,'coins')
+
+		# items
+		item_layout = import_csv_layout(level_data['items'])
+		self.item_sprites = self.create_tile_group(item_layout, 'items')
 
 		# foreground palms 
 		fg_palm_layout = import_csv_layout(level_data['fg palms'])
@@ -116,6 +120,9 @@ class Level:
 					if type == 'coins':
 						if val == '0': sprite = Coin(tile_size,x,y,'../graphics/coins/gold',5)
 						if val == '1': sprite = Coin(tile_size,x,y,'../graphics/coins/silver',1)
+
+					if type == 'items':
+						sprite = CrateItem(tile_size,x,y,'../graphics/character/hat.png',50)
 
 					if type == 'fg palms':
 						if val == '0': sprite = Palm(tile_size,x,y,'../graphics/terrain/palm_small',38)
@@ -248,6 +255,14 @@ class Level:
 			for coin in collided_coins:
 				self.change_coins(coin.value)
 
+	def check_items_collisions(self):
+		collided_items = pygame.sprite.spritecollide(self.player.sprite,self.item_sprites,True)
+		if collided_items:
+			self.coin_sound.play()
+			for item in collided_items:
+				self.player.sprite.change_health(item.value)
+				item.kill()
+
 	def check_enemy_collisions(self):
 		enemy_collisions = pygame.sprite.spritecollide(self.player.sprite,self.enemy_sprites,False)
 
@@ -375,6 +390,10 @@ class Level:
 		self.explosion_sprites.update(self.world_shift)
 		self.explosion_sprites.draw(self.display_surface)
 
+		# items
+		self.item_sprites.update(self.world_shift)
+		self.item_sprites.draw(self.display_surface)
+
 		# crate 
 		self.crate_sprites.update(self.world_shift)
 		self.crate_sprites.draw(self.display_surface)
@@ -411,6 +430,7 @@ class Level:
 		self.check_enemy_collisions()
 		self.check_boss_collisions()
 		self.check_crate_collisions()
+		self.check_items_collisions()
 
 		# water 
 		self.water.draw(self.display_surface,self.world_shift)
