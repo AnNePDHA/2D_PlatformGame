@@ -11,7 +11,7 @@ class Boss(AnimatedTile):
 		self.image = self.animations['walk'][self.frame_index]
 		self.rect.y += size - self.image.get_size()[1]
 		self.animation_speed = 0.15
-		self.speed = randint(3,5)
+		self.speed = 3
 
 		# boss status
 		self.status = 'walk'

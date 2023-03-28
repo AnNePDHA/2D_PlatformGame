@@ -4,9 +4,9 @@ from random import randint
 
 class Enemy(AnimatedTile):
 	def __init__(self,size,x,y):
-		super().__init__(size,x,y,'../graphics/enemy/run')
+		super().__init__(size,x,y,'../graphics/enemy/walk')
 		self.rect.y += size - self.image.get_size()[1]
-		self.speed = randint(3,5)
+		self.speed = 2
 
 	def move(self):
 		self.rect.x += self.speed
