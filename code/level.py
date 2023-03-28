@@ -148,6 +148,11 @@ class Level:
 			if pygame.sprite.spritecollide(enemy,self.constraint_sprites,False):
 				enemy.reverse()
 
+	def boss_collision_reverse(self):
+		for boss in self.boss_sprites.sprites():
+			if pygame.sprite.spritecollide(boss, self.constraint_sprites, False):
+				boss.reverse()
+
 	def create_jump_particles(self,pos):
 		if self.player.sprite.facing_right:
 			pos -= pygame.math.Vector2(10,5)
@@ -222,8 +227,8 @@ class Level:
 
 	def check_death(self):
 		if self.player.sprite.rect.top > screen_height:
-			# self.create_overworld(self.current_level,0)
-			self.player_setup(player_layout, change_health)
+			self.create_overworld(self.current_level,0)
+			# self.player_setup(player_layout, change_health)
 			
 	def check_win(self):
 		if pygame.sprite.spritecollide(self.player.sprite,self.goal,False):
@@ -267,6 +272,37 @@ class Level:
 				else:
 					self.player.sprite.get_damage()
 
+	def check_boss_collisions(self):
+		boss_collisions = pygame.sprite.spritecollide(self.player.sprite,self.boss_sprites,False)
+
+		if boss_collisions:
+			for boss in boss_collisions:
+				boss_center = boss.rect.centery
+				boss_centerX = boss.rect.centerx
+				boss_top = boss.rect.top
+				boss_bottom = boss.rect.bottom
+				boss_right = boss.rect.right
+				boss_left = boss.rect.left
+				player_centerX = self.player.sprite.rect.centerx
+				player_bottom = self.player.sprite.rect.bottom
+				player_top = self.player.sprite.rect.top
+				player_right = self.player.sprite.rect.right
+				player_left = self.player.sprite.rect.left
+				if boss_top < player_bottom < boss_center and self.player.sprite.direction.y >= 0:
+					self.stomp_sound.play()
+					self.player.sprite.direction.y = -10
+					explosion_sprite = ParticleEffect(boss.rect.center,'explosion')
+					self.explosion_sprites.add(explosion_sprite)
+					boss.kill()
+				elif self.player.sprite.onAttack == True and 4 < self.player.sprite.frame_index < 8 and ((self.player.sprite.facing_right == True and boss_left > player_centerX) or (self.player.sprite.facing_right == False and boss_right < player_centerX)):
+					self.stomp_sound.play()
+					#self.player.sprite.direction.y = -10
+					explosion_sprite = ParticleEffect(boss.rect.center,'explosion')
+					self.explosion_sprites.add(explosion_sprite)
+					boss.kill()
+				else:
+					self.player.sprite.get_damage()
+
 	def run(self):
 		# run the entire game / level 
 		
@@ -291,6 +327,14 @@ class Level:
 		self.constraint_sprites.update(self.world_shift)
 		self.enemy_collision_reverse()
 		self.enemy_sprites.draw(self.display_surface)
+		self.explosion_sprites.update(self.world_shift)
+		self.explosion_sprites.draw(self.display_surface)
+
+		# boss
+		self.boss_sprites.update(self.world_shift)
+		self.constraint_sprites.update(self.world_shift)
+		self.boss_collision_reverse()
+		self.boss_sprites.draw(self.display_surface)
 		self.explosion_sprites.update(self.world_shift)
 		self.explosion_sprites.draw(self.display_surface)
 
@@ -328,6 +372,7 @@ class Level:
 
 		self.check_coin_collisions()
 		self.check_enemy_collisions()
+		self.check_boss_collisions()
 
 		# water 
 		self.water.draw(self.display_surface,self.world_shift)
