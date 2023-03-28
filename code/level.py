@@ -9,6 +9,7 @@ from player import Player
 from particles import ParticleEffect
 from game_data import levels
 
+
 class Level:
 	def __init__(self,current_level,surface,create_overworld,change_coins,change_health):
 		# general setup
@@ -84,6 +85,8 @@ class Level:
 		self.water = Water(screen_height - 20,level_width)
 		self.clouds = Clouds(400,level_width,30)
 
+		self.range = 10
+
 	def create_tile_group(self,layout,type):
 		sprite_group = pygame.sprite.Group()
 
@@ -121,7 +124,7 @@ class Level:
 						sprite = Enemy(tile_size,x,y)
 
 					if type == 'boss':
-						sprite = Boss(tile_size,x,y)
+						sprite = Boss(tile_size,x,y,100)
 
 					if type == 'constraint':
 						sprite = Tile(tile_size,x,y)
@@ -293,15 +296,45 @@ class Level:
 					self.player.sprite.direction.y = -10
 					explosion_sprite = ParticleEffect(boss.rect.center,'explosion')
 					self.explosion_sprites.add(explosion_sprite)
-					boss.kill()
+					boss.onHit = True
 				elif self.player.sprite.onAttack == True and 4 < self.player.sprite.frame_index < 8 and ((self.player.sprite.facing_right == True and boss_left > player_centerX) or (self.player.sprite.facing_right == False and boss_right < player_centerX)):
 					self.stomp_sound.play()
 					#self.player.sprite.direction.y = -10
 					explosion_sprite = ParticleEffect(boss.rect.center,'explosion')
 					self.explosion_sprites.add(explosion_sprite)
-					boss.kill()
+					boss.onHit = True
 				else:
+					boss.onAttack = True
 					self.player.sprite.get_damage()
+
+	def check_crate_collisions(self):
+		crate_collisions = pygame.sprite.spritecollide(self.player.sprite,self.crate_sprites,False)
+
+		if crate_collisions:
+			for crate in crate_collisions:
+				crate_center = crate.rect.centery
+				crate_centerX = crate.rect.centerx
+				crate_top = crate.rect.top
+				crate_bottom = crate.rect.bottom
+				crate_right = crate.rect.right
+				crate_left = crate.rect.left
+				player_centerX = self.player.sprite.rect.centerx
+				player_bottom = self.player.sprite.rect.bottom
+				player_top = self.player.sprite.rect.top
+				player_right = self.player.sprite.rect.right
+				player_left = self.player.sprite.rect.left
+				if crate_top < player_bottom < crate_center and self.player.sprite.direction.y >= 0:
+					self.stomp_sound.play()
+					self.player.sprite.direction.y = -10
+					explosion_sprite = ParticleEffect(crate.rect.center,'explosion')
+					self.explosion_sprites.add(explosion_sprite)
+					crate.kill()
+				elif self.player.sprite.onAttack == True and 4 < self.player.sprite.frame_index < 8 and ((self.player.sprite.facing_right == True and crate_left > player_centerX) or (self.player.sprite.facing_right == False and crate_right < player_centerX)):
+					self.stomp_sound.play()
+					#self.player.sprite.direction.y = -10
+					explosion_sprite = ParticleEffect(crate.rect.center,'explosion')
+					self.explosion_sprites.add(explosion_sprite)
+					crate.kill()
 
 	def run(self):
 		# run the entire game / level 
@@ -373,6 +406,7 @@ class Level:
 		self.check_coin_collisions()
 		self.check_enemy_collisions()
 		self.check_boss_collisions()
+		self.check_crate_collisions()
 
 		# water 
 		self.water.draw(self.display_surface,self.world_shift)

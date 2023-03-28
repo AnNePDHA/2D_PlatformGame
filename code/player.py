@@ -134,11 +134,11 @@ class Player(pygame.sprite.Sprite):
 			self.create_jump_particles(self.rect.midbottom)
 
 	def get_status(self):
-		if self.onHit == True:
+		if self.onHit:
 			self.status = 'hit'
 			return
-		if self.onAttack == True:
-			if(self.status != 'attack' and self.status != 'skill'):
+		if self.onAttack:
+			if self.status != 'attack' and self.status != 'skill':
 				randAttack = ['attack', 'skill']
 				self.status = random.choice(randAttack)
 			return
