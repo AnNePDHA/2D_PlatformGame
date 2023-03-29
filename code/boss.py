@@ -6,15 +6,15 @@ from random import randint
 
 class Boss(AnimatedTile):
 	def __init__(self,size,x,y,change_health):
-		super().__init__(size,x,y,'../graphics/BiggerBoss/walk')
+		super().__init__(size,x,y,'../graphics/BiggerBoss/idle')
 		self.import_character_assets()
-		self.image = self.animations['walk'][self.frame_index]
+		self.image = self.animations['idle'][self.frame_index]
 		self.rect.y += size - 64
 		self.animation_speed = 0.15
-		self.speed = 3
+		self.speed = 0
 
 		# boss status
-		self.status = 'walk'
+		self.status = 'idle'
 		self.onHit = False
 		self.onAttack = False
 
