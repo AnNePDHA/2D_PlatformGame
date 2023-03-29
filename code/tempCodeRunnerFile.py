@@ -1,2 +1,1 @@
-
-			self.max_level = 0
+-1
